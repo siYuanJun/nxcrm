@@ -18,11 +18,11 @@ class Opportunity extends Model
 
     public function events()
     {
-        return $this->hasMany(Event::class);
+        return $this->hasMany(Event::class)->orderBy('updated_at', 'desc');
     }
 
     public function attachments()
     {
-        return $this->hasMany(Attachment::class);
+        return $this->hasMany(Attachment::class)->orderBy('updated_at', 'desc');
     }
 }

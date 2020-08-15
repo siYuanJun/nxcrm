@@ -17,6 +17,7 @@ class OpportunityController extends AdminController
     public static $css = [
         '/static/css/opportunity_show.css',
     ];
+
     /**
      * Make a grid builder.
      *
@@ -30,7 +31,7 @@ class OpportunityController extends AdminController
             $opportunity = Opportunity::whereHas('customer', function ($query) {
                 $query->where('admin_users_id', Admin::user()->id);
             });
-        }else{
+        } else {
             $opportunity = new Opportunity();
         }
 
@@ -65,7 +66,7 @@ class OpportunityController extends AdminController
                 0 => '已失败',
                 1 => '跟进中',
                 2 => '成功',
-            ],true);
+            ], true);
 
             $grid->model()->orderBy('id', 'desc');
             $grid->filter(function (Grid\Filter $filter) {
@@ -93,14 +94,16 @@ class OpportunityController extends AdminController
             $this->authorize('update', $customer);
         }
 
-
         Admin::css(static::$css);
+
         $opportunity = Opportunity::query()->findorFail($id);
-        $customer = Opportunity::find($id)->customer;
-        $contacts = Customer::find(Opportunity::find($id)->customer_id)->contacts;
-        $events = Customer::find($id)->events()->orderBy('updated_at', 'desc')->get();
-        $attachments = Opportunity::find($id)->attachments()->orderBy('updated_at', 'desc')->get();
-        $admin_users = Opportunity::find($id)->customer->admin_users;
+        $customer = $opportunity->customer;
+        $contacts = $customer->contacts;
+        $events = $customer->events;
+        dd($events);
+        $attachments = $opportunity->attachments;
+        $admin_users = $customer->admin_users;
+
         $data = [
             'opportunity' => $opportunity,
             'customer' => $customer,
@@ -114,6 +117,7 @@ class OpportunityController extends AdminController
             ->description('详情')
             ->body($this->_detail($data));
     }
+
     private function _detail($data)
     {
         return view('admin/opportunity/show', $data);
@@ -138,7 +142,7 @@ class OpportunityController extends AdminController
             $form->display('id');
             $form->text('subject');
             $form->selectResource('customer_id')
-                ->path('customers') // 设置表格页面链接;
+                ->path('customers')// 设置表格页面链接;
                 ->multiple(1)
                 ->options(function ($v) { // 显示已选中的数据
                     if (!$v) return $v;
@@ -153,7 +157,7 @@ class OpportunityController extends AdminController
             $form->display('created_at');
             $form->display('updated_at');
             $form->saving(function (Form $form) {
-                if($form->expectincome){
+                if ($form->expectincome) {
                     $form->expectincome = str_replace(',', '', $form->expectincome);
                 }
                 return $form->expectincome;

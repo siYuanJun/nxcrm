@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class Contracts extends Bar
 {
-  
+
     /**
      * 初始化卡片内容
      */
@@ -109,21 +109,22 @@ HTML
      * 月环比.
      */
 
-     public function grow (){
+    public function grow()
+    {
         $origin = DB::table('contracts')->selectRaw('DATE_FORMAT(signdate,"%Y-%m") as date,COUNT(*) as value')
-        ->whereMonth('signdate', date('m'))
-        ->groupBy('date')
-        ->get();
+            ->whereMonth('signdate', date('m'))
+            ->groupBy('date')
+            ->get();
 
         $last_month = DB::table('contracts')->selectRaw('DATE_FORMAT(signdate,"%Y-%m") as date,COUNT(*) as value')
-        ->whereMonth('signdate', date('m')-1)
-        ->groupBy('date')
-        ->get();
+            ->whereMonth('signdate', date('m') - 1)
+            ->groupBy('date')
+            ->get();
 
-        $grow = round(($origin[0]->value - $last_month[0]->value)/$last_month[0]->value * 100);
-
-        return $grow;
-     }
-
+        if (isset($origin[0]) && isset($last_month[0])) {
+            $grow = round(($origin[0]->value - $last_month[0]->value) / $last_month[0]->value * 100);
+            return $grow;
+        }
+    }
 
 }

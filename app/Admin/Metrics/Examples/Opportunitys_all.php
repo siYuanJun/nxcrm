@@ -21,8 +21,6 @@ class Opportunitys_all extends Round
         $this->chartLabels(['被拒绝', '已成功', '跟进中']);
 
 
-
-
         $opportunitys = DB::table('opportunitys');
         $this->opportunitys_num = $opportunitys->count();
         $this->num = $opportunitys->selectRaw('state,COUNT(*) as value')->groupBy('state')->get();
@@ -40,13 +38,16 @@ class Opportunitys_all extends Round
     {
         $count = (array_column($this->num->toArray(), 'value'));
         // 卡片内容
+        $count[1] = isset($count[1]) ?: 0;
+        $count[2] = isset($count[2]) ?: 0;
+
         $this->withContent($count);
 
         // 图表数据
         $this->withChart($count);
         // 总数
         $this->chartTotal('总数', $this->opportunitys_num);
-        $this->contentWidth(1,10,1);
+        $this->contentWidth(1, 10, 1);
     }
 
     /**
@@ -64,7 +65,6 @@ class Opportunitys_all extends Round
     }
 
 
-
     /**
      * 卡片底部内容.
      *
@@ -76,8 +76,8 @@ class Opportunitys_all extends Round
      */
     public function withContent($count)
     {
-        return $this->footer(
-            <<<HTML
+            return $this->footer(
+                <<<HTML
 <div class="d-flex justify-content-between p-1" style="padding-top: 0!important;">
     <div class="text-center">
         <p>已完成</p>
@@ -93,6 +93,6 @@ class Opportunitys_all extends Round
     </div>
 </div>
 HTML
-        );
+            );
     }
 }

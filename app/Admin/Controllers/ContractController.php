@@ -17,6 +17,7 @@ class ContractController extends AdminController
     public static $css = [
         '/static/css/contract_show.css',
     ];
+
     /**
      * Make a grid builder.
      *
@@ -29,7 +30,7 @@ class ContractController extends AdminController
             $contract = Contract::whereHas('customer', function ($query) {
                 $query->where('admin_users_id', Admin::user()->id);
             });
-        }else{
+        } else {
             $contract = new Contract();
         }
 
@@ -37,9 +38,9 @@ class ContractController extends AdminController
             $grid->status
                 ->using(
                     [
-                        1 => '未开始', 
-                        2 => '执行中', 
-                        3 => '正常结束', 
+                        1 => '未开始',
+                        2 => '执行中',
+                        3 => '正常结束',
                         4 => '意外终止'
                     ]
                 )->dot(
@@ -53,7 +54,7 @@ class ContractController extends AdminController
                 );
 
             $grid->title->link(function () {
-                return admin_url('contracts/'.$this->id);
+                return admin_url('contracts/' . $this->id);
             });
             $grid->customer_id('所属客户')->display(function ($id) {
                 return Customer::find($id)->name;
@@ -63,8 +64,8 @@ class ContractController extends AdminController
             $grid->signdate->sortable();
             $grid->expiretime->sortable();
             $grid->total->display(function ($total) {
-                    return "<span style='color:#EE8C0C; font-weight: 700;'>$total</span>";
-                });
+                return "<span style='color:#EE8C0C; font-weight: 700;'>$total</span>";
+            });
             // $grid->column('order','合同额')->display(function ($order) {
             //     $prods = json_decode($order);
             //     $executionprice_quantity = 0;
@@ -72,9 +73,8 @@ class ContractController extends AdminController
             //         $executionprice_quantity += $prod->executionprice * $prod->quantity;
             //     }
             //     return "<span style='color:#EE8C0C; font-weight: 700;'>$executionprice_quantity</span>";
-            
-            // });
 
+            // });
 
             $grid->model()->orderBy('id', 'desc');
             $grid->disableBatchActions();
@@ -93,7 +93,7 @@ class ContractController extends AdminController
      */
 
     public function show($id, Content $content)
-    { 
+    {
 
         $detalling = Admin::user()->id != Contract::find($id)->customer->admin_users->id;
         $Role = !Admin::user()->isRole('administrator');
@@ -125,15 +125,15 @@ class ContractController extends AdminController
             'attachments' => $attachments,
         ];
         return $content
-        ->title('合同')
-        ->description('详情')
-        ->body($this->_detail($data));
-    }
-    private function _detail ($data)
-    {
-        return view('admin/contract/show',$data);
+            ->title('合同')
+            ->description('详情')
+            ->body($this->_detail($data));
     }
 
+    private function _detail($data)
+    {
+        return view('admin/contract/show', $data);
+    }
 
 
     /**
@@ -152,11 +152,10 @@ class ContractController extends AdminController
 
             Admin::css(static::$css);
 
-
             $form->column(6, function (Form $form) {
                 $form->text('title')->required();
                 $form->selectResource('customer_id')
-                    ->path('customers') // 设置表格页面链接;
+                    ->path('customers')// 设置表格页面链接;
                     ->multiple(1)
                     ->options(function ($v) { // 显示已选中的数据
                         if (!$v) return $v;
@@ -165,14 +164,11 @@ class ContractController extends AdminController
                 $form->date('signdate', '签署时间')->required();
             });
 
-
             $form->column(6, function (Form $form) {
                 $form->display('id');
                 $form->select('status', '合同状态')->options([1 => '未开始', 2 => '执行中', 3 => '正常结束', 4 => '意外终止']);
                 $form->date('expiretime', '到期时间')->required();
             });
-
-
 
             $form->column(12, function (Form $form) {
                 $form->table('order', '订单', function ($table) {
@@ -197,10 +193,12 @@ class ContractController extends AdminController
             // });
 
             $form->column(6, function (Form $form) {
+                $form->total = str_replace(",", "", $form->total);
                 $form->currency('total', '合同金额')->symbol('￥')->attribute('min', 0)->default(0);
             });
 
             $form->column(6, function (Form $form) {
+                $form->salesexpenses = str_replace(",", "", $form->salesexpenses);
                 $form->currency('salesexpenses', '商务费用')->symbol('￥')->attribute('min', 0)->default(0);
             });
 
@@ -217,7 +215,7 @@ class ContractController extends AdminController
             $contract = Contract::whereHas('customer', function ($query) {
                 $query->where('admin_users_id', Admin::user()->id);
             });
-        }else{
+        } else {
             $contract = new Contract();
         }
         $grid = new IFrameGrid($contract);

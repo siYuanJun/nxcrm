@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class Customers extends Bar
 {
-  
+
     /**
      * 初始化卡片内容
      */
@@ -109,21 +109,20 @@ HTML
      * 月环比.
      */
 
-     public function grow (){
+    public function grow()
+    {
         $origin = DB::table('customers')->selectRaw('DATE_FORMAT(created_at,"%Y-%m") as date,COUNT(*) as value')
-        ->whereMonth('created_at', date('m'))
-        ->groupBy('date')
-        ->get();
+            ->whereMonth('created_at', date('m'))
+            ->groupBy('date')
+            ->get();
 
         $last_month = DB::table('customers')->selectRaw('DATE_FORMAT(created_at,"%Y-%m") as date,COUNT(*) as value')
-        ->whereMonth('created_at', date('m')-1)
-        ->groupBy('date')
-        ->get();
-
-        $grow = round(($origin[0]->value - $last_month[0]->value)/$last_month[0]->value * 100);
-
-        return $grow;
-     }
-
-
+            ->whereMonth('created_at', date('m') - 1)
+            ->groupBy('date')
+            ->get();
+        if(isset($origin[0]) && isset($last_month[0])) {
+            $grow = round(($origin[0]->value - $last_month[0]->value) / $last_month[0]->value * 100);
+            return $grow;
+        }
+    }
 }
